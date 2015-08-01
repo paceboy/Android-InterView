@@ -8,3 +8,4 @@ android 面试汇总
 ###1，按home键时；2，横竖屏切换时；3，按电源键时；4，从当前activity进入另一个activity时。
 ###系统默认只会保存ui状态--view hierarchy，比如editext里面的text，或者listview的scroll位置，
 ###不会保存别的信息，如果需要保存则复写此方法。
+![mahua] https://github.com/paceboy/Android-InterView/blob/master/handler-howtowork.png
