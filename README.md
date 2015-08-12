@@ -115,6 +115,7 @@ cwnd加1，而不是加倍。这样拥塞窗口按线性规律缓慢增长。
 先说区别，aidl是解决android进程通信问题，是一种rpc的调用方式。由Dianne Hackbor提出。传统的linux通信有pipe管道、信号和跟踪。但其都局限于父进程与子进程之间，或者兄弟进程之间，后来增加了命名管道，使得不再局限于亲戚之间进程，后来AT&T Unix又增加报文队列，共享内存和信号量，BSD Linux增加了socket进程通信机制。为什么android自己设计一个新的ipc方式，原因如下：
 另一方面是传输性能。socket作为一款通用接口，其传输效率低，开销大，主要用在跨网络的进程间通信和本机上进程间的低速通信。消息队列和管道采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，至少有两次拷贝过程。共享内存虽然无需拷贝，但控制复杂，难以使用。
 各种IPC方式数据拷贝次数如下表：
+
 IPC	数据copy次数
 共内存	0
 Binder	1
@@ -123,9 +124,8 @@ Socket/Pipe/消息队列	2
 还有一点是出于安全性考虑。Android作为一个开放式，拥有众多开发者的的平台，应用程序的来源广泛，确保智能终端的安全是非常重要的。终端用户不希望从网上下载的程序在不知情的情况下偷窥隐私数据，连接无线网络，长期操作底层设备导致电池很快耗尽等等。传统IPC没有任何安全措施，完全依赖上层协议来确保。首先传统IPC的接收方无法获得对方进程可靠的UID/PID（用户ID/进程ID），从而无法鉴别对方身份。Android为每个安装好的应用程序分配了自己的UID，故进程的UID是鉴别进程身份的重要标志。使用传统IPC只能由用户在数据包里填入UID/PID，但这样不可靠，容易被恶意程序利用。可靠的身份标记只有由IPC机制本身在内核中添加。其次传统IPC访问接入点是开放的，无法建立私有通道。比如命名管道的名称，system V的键值，socket的ip地址或文件名都是开放的，只要知道这些接入点的程序都可以和对端建立连接，不管怎样都无法阻止恶意程序通过猜测接收方地址获得连接。
 
 Binder提供了远程过程调用RPC功能，英文意思是粘结剂的意思。在android的binder机制中，由一系列组件组成，分别是client，server，service manager和binder驱动程序，其中client，server和service manager运行在用户空间，binder驱动程序运行在内核空间，binder就是将这四个组件粘合在一起的粘结剂，其中核心组件便是binder驱动程序，service manger提供了辅助管理功能，client和server正式在binder驱动和service manger提供的基础设施上，进行client-server之间的通信。Service Manager和Binder驱动已经在Android平台中实现好，开发者只要按照规范实现自己的Client和Server组件就可以了。如图所示
- 
+ ![](https://github.com/paceboy/Android-InterView/blob/master/aidl_structure.png)
 
 调用方式的实现参考：http://blog.csdn.net/songjinshi/article/details/22918405
-
 参考：http://www.cnblogs.com/albert1017/p/3849585.html
 
