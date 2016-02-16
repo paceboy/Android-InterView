@@ -21,6 +21,9 @@ handler： 用来发送message和处理message。在使用handler之前必须使
 有个问题，为什么非要出来个looper，而不是把looper的功能放到handler里面实现呢？
 我觉得是面向对象的原则，由于looper里面的功能基本不怎么变化，也不需要用户了解，
 因此将其封装，仅仅将handler和message对用户开放去调用。
+
+在非主线程中直接new Handler() 会报如下的错误:  java.lang.RuntimeException: Can't create handler inside thread that has not called Looper.prepare() 原因是非主线程中默认没有创建Looper对象，需要先调用Looper.prepare()启用Looper。 
+
 ![mahua]( https://github.com/paceboy/Android-InterView/blob/master/handler-howtowork.png)
 ##TCP的3次握手和4次挥手？
 3次握手连接，首先连接端发送一个连接请求，syn为1，接收端回复一个确认表示同意连接，
